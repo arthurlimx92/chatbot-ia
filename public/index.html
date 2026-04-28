@@ -1,29 +1,145 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Chatbot IA</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assistente IA</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
 </head>
 <body>
-    <button onclick="toggleTheme()" class="theme-btn">🌙</button>
-    
-    
-<div class="container">
-  <div class="header">
-    🤖 Assistente IA
-    
+  <div class="noise-overlay"></div>
+
+  <!-- Modal de confirmação de exclusão -->
+  <div class="modal-backdrop" id="deleteModal">
+    <div class="modal">
+      <div class="modal-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3>Apagar histórico</h3>
+      <p>Esta ação é irreversível. Todo o histórico desta conversa será permanentemente excluído.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="cancelDelete">Cancelar</button>
+        <button class="btn-confirm" id="confirmDelete">Apagar tudo</button>
+      </div>
+    </div>
   </div>
-  
 
-  <div id="chat" class="chat"></div>
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Assistente</span>
+        </div>
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Fechar menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
 
-  <div class="input-area">
-    <input id="input" placeholder="Digite sua mensagem..." />
-    <button onclick="sendMessage()">➤</button>
+      <div class="sidebar-section">
+        <span class="sidebar-label">Conversa atual</span>
+        <div class="conv-item active">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Nova conversa</span>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="btn-clear" id="clearBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Apagar histórico
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main chat area -->
+    <main class="chat-area">
+      <header class="chat-header">
+        <button class="menu-btn" id="menuBtn" aria-label="Abrir menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <div class="header-title">
+          <div class="status-dot"></div>
+          <span>Chat — Assistente IA</span>
+        </div>
+        <button class="header-clear-btn" id="headerClearBtn" title="Apagar histórico">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </header>
+
+      <div class="messages" id="messages">
+        <div class="welcome-state" id="welcomeState">
+          <div class="welcome-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h2>Como posso ajudar?</h2>
+          <p>Faça qualquer pergunta ou inicie uma conversa.</p>
+          <div class="suggestions">
+            <button class="suggestion-chip" onclick="useSuggestion(this)">Explique como funciona a IA</button>
+            <button class="suggestion-chip" onclick="useSuggestion(this)">Ajude-me a escrever um texto</button>
+            <button class="suggestion-chip" onclick="useSuggestion(this)">Revise meu código</button>
+            <button class="suggestion-chip" onclick="useSuggestion(this)">Traduza para o inglês</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <div class="input-wrapper">
+          <textarea
+            id="userInput"
+            placeholder="Digite uma mensagem..."
+            rows="1"
+            autocomplete="off"
+            spellcheck="true"
+          ></textarea>
+          <div class="input-actions">
+            <button class="voice-btn" id="voiceBtn" title="Falar mensagem" aria-label="Ativar reconhecimento de voz">
+              <svg class="icon-mic" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <svg class="icon-mic-stop" width="18" height="18" viewBox="0 0 24 24" fill="none" style="display:none">
+                <rect x="6" y="6" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+              <span class="voice-pulse"></span>
+            </button>
+            <button class="send-btn" id="sendBtn" title="Enviar mensagem" disabled>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <line x1="22" y1="2" x2="11" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <p class="input-hint">IA pode cometer erros. Verifique informações importantes.</p>
+      </div>
+    </main>
   </div>
-</div>
 
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

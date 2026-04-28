@@ -22,14 +22,14 @@ app.post("/chat", async (req, res) => {
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [
-  { role: "system", content: "Você é um atendente profissional de uma empresa de tecnologia." },
+  { role: "system", content: "Você é um assistente útil, preciso e direto. Responda sempre em português brasileiro, a menos que o usuário escreva em outro idioma." },
   { role: "user", content: message }
 ]
       })
     });
 
     const data = await response.json();
-    console.log(data); // 👈 AQUI, logo depois do response.json()
+    console.log(data); 
 
     if (data.choices)
     res.json({ reply: data.choices[0].message.content });
