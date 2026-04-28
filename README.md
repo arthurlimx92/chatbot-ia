@@ -118,7 +118,6 @@ npm start
 * Autenticação de usuários
 * Interface estilo chat moderno (tipo WhatsApp/ChatGPT)
 * Streaming de respostas
-* Deploy do frontend separado
 
 ---
 
